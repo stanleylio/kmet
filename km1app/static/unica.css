@@ -1,0 +1,13 @@
+/* unica-one-regular - latin */
+@font-face {
+  font-family: 'Unica One';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/unica-one-v4-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Unica One'), local('UnicaOne-Regular'),
+       url('./fonts/unica-one-v4-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('./fonts/unica-one-v4-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('./fonts/unica-one-v4-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('./fonts/unica-one-v4-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('./fonts/unica-one-v4-latin-regular.svg#UnicaOne') format('svg'); /* Legacy iOS */
+}
