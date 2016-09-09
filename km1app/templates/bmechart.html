@@ -4,7 +4,7 @@
 <link href="{{ url_for('static',filename='unica.css') }}" rel="stylesheet" type="text/css">
 
 <br><br><br>
-<div id="container" style="width: 80%; height: 500px; margin: 0 auto"></div>
+<div id="container" style="width: 90%; height: 500px; margin: 0 auto"></div>
 <br><br><br>
 
 <div style="width: 800px; margin: 0 auto; color: #000000">
@@ -12,11 +12,12 @@
 	<p>Sensor is now sitting on THIS desk. Data are collected and served by a Beaglebone Black single-board computer.</p>
 </div>
 
+<script src="{{ url_for('static',filename='reconnecting-websocket.js') }}" type="text/javascript"></script>
 <script>
 var chart;
 
 function addpoint(d) {
-	var window_size = 24*3600;
+	var window_size = 72*3600;
 	var t = d['t'];
 	var p = d['p'];
 	var rh = d['rh'];
@@ -32,6 +33,34 @@ function addpoint(d) {
 		series = chart.series[2];
 		shift = series.data.length > window_size;
 		chart.series[2].addPoint([Date.now(),rh], true, shift);
+	}
+}
+
+function is_fresh() {
+	if (!(chart == null)) {
+		var max_t = 0;
+		for (var i = 0; i < chart.series[0].data.length; i++) {
+			var v = chart.series[0].data[i];
+			if (v.x > max_t) {
+				max_t = v.x;
+			}
+		}
+		//console.log(Date.now(),max_t,Date.now() - max_t);
+		return (Date.now() - max_t) < 10*1000;
+	}
+	console.log("chart not ready");
+	return false;
+}
+
+function check_liveliness() {
+	if (is_fresh()) {
+		//console.log('fresh');
+		$('body').css("-webkit-filter","");
+		$('body').css("filter","");
+	} else {
+		//console.log('stale');
+		$('body').css("-webkit-filter","grayscale(100%)");
+		$('body').css("filter","grayscale(100%)");
 	}
 }
 
@@ -80,6 +109,7 @@ $(function() {
 				}
 			}
 		},{
+			gridLineWidth: 0,
 			labels: {
 				format: '{value}kPa',
 				style: {
@@ -95,6 +125,7 @@ $(function() {
 			},
 			opposite: true
 		},{
+			gridLineWidth: 0,
 			labels: {
 				format: '{value}%',
 				style: {
@@ -176,11 +207,16 @@ $(function() {
 			}
 		},*/
 	});		
+	
+	setInterval(check_liveliness,5*1000);
+
 });
 
 //var url = "ws://localhost:9000/";
-var url = "ws://166.122.97.73:9000";
-ws = new WebSocket(url);
+//var url = "ws://166.122.97.73:9000";
+var url = "ws://" + String(window.location.host) + ":9000";
+//ws = new WebSocket(url);
+ws = new ReconnectingWebSocket(url);
 ws.onopen = function(evt) { console.log(evt) };
 ws.onclose = function(evt) { console.log("closed") };
 ws.onmessage = function(evt) {
