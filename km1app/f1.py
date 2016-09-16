@@ -21,6 +21,10 @@ def by_sensor_bme280():
 def info():
     return render_template('info.html')
 
+@app.route('/faq/')
+def faq():
+    return render_template('faq.html')
+
 @app.route('/about/')
 def about():
     return render_template('about.html')
