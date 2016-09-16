@@ -8,8 +8,15 @@
 <br><br><br>
 
 <div style="width: 800px; margin: 0 auto; color: #000000">
-	<p>Live data from a Bosch Temperature, Barometric Pressure and Relative Humidity sensor (BME280).</p>
-	<p>Sensor is now sitting on THIS desk. Data are collected and served by a Beaglebone Black single-board computer.</p>
+	<p>Live data from a Bosch BME280 Temperature, Barometric Pressure and Relative Humidity sensor.</p>
+	<p>Sensor is located inside the <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">electrical box</a> up on the met mast... not yet. The sensor is actually sitting on my desk.</p>
+	<br>
+	<p>Sensor is polled every N seconds.</p>
+	<p>This page turns grayscale if connection to server is lost.</p>
+	<p>Individual time series can be toggled ON/OFF by clicking the legend entries.</p>
+	<br>
+	<p>TODO: initial plot with past N minutes of data on page load</p>
+	<p>... but should it? this is a real-time plot, I'm assuming it's unattended most of the time. No one will be there to refresh it all the time.</p>
 </div>
 
 <script src="{{ url_for('static',filename='reconnecting-websocket.js') }}" type="text/javascript"></script>
@@ -17,7 +24,7 @@
 var chart;
 
 function addpoint(d) {
-	var window_size = 72*3600;
+	var window_size = 3*24*3600;
 	var t = d['t'];
 	var p = d['p'];
 	var rh = d['rh'];
@@ -26,12 +33,12 @@ function addpoint(d) {
 		var shift = series.data.length > window_size;
 		chart.series[0].addPoint([Date.now(),t], true, shift);
 		
-		series = chart.series[1];
-		shift = series.data.length > window_size;
+		//series = chart.series[1];
+		//shift = series.data.length > window_size;
 		chart.series[1].addPoint([Date.now(),p], true, shift);
 		
-		series = chart.series[2];
-		shift = series.data.length > window_size;
+		//series = chart.series[2];
+		//shift = series.data.length > window_size;
 		chart.series[2].addPoint([Date.now(),rh], true, shift);
 	}
 }
@@ -40,13 +47,13 @@ function is_fresh() {
 	if (!(chart == null)) {
 		var max_t = 0;
 		for (var i = 0; i < chart.series[0].data.length; i++) {
-			var v = chart.series[0].data[i];
-			if (v.x > max_t) {
-				max_t = v.x;
+			var x = chart.series[0].data[i].x;
+			if (x > max_t) {
+				max_t = x;
 			}
 		}
 		//console.log(Date.now(),max_t,Date.now() - max_t);
-		return (Date.now() - max_t) < 10*1000;
+		return (Date.now() - max_t) < 2*60*1000;
 	}
 	console.log("chart not ready");
 	return false;
@@ -104,7 +111,7 @@ $(function() {
 				text: 'Temperature',
 				margin: 30,
 				style: {
-					fontSize: '20px',
+					fontSize: '24px',
 					color: t_color
 				}
 			}
@@ -119,7 +126,7 @@ $(function() {
 			title: {
 				text: 'Barometric Pressure',
 				style: {
-					fontSize: '20px',
+					fontSize: '24px',
 					color: p_color
 				}
 			},
@@ -135,7 +142,7 @@ $(function() {
 			title: {
 				text: 'Relative Humidity',
 				style: {
-					fontSize: '20px',
+					fontSize: '24px',
 					color: rh_color
 				}
 			},
@@ -208,7 +215,7 @@ $(function() {
 		},*/
 	});		
 	
-	setInterval(check_liveliness,5*1000);
+	setInterval(check_liveliness,20*1000);
 
 });
 

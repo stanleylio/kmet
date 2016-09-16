@@ -13,6 +13,10 @@ def route_index():
 def plot():
     return render_template('bmechart.html')
 
+@app.route('/by_sensor/bme280/')
+def by_sensor_bme280():
+    return render_template('bmechart.html')
+
 @app.route('/info/')
 def info():
     return render_template('info.html')
