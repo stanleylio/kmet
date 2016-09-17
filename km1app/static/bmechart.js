@@ -187,6 +187,10 @@ $(function() {
 			x: 100,
 			backgroundColor: '#ffffff',
 		},
+		/*exporting: {
+			sourceWidth: 1600,
+			sourceHeight: 800,
+		},*/
 		credits: {
 			enabled: false
 		},
@@ -206,7 +210,7 @@ $(function() {
 				}
 			}
 		},*/
-	});		
+	});
 	
 	setInterval(check_liveliness,5*60*1000);
 });

@@ -1,0 +1,13 @@
+body {
+	padding-top: 30px;
+}
+/*http://zerosixthree.se/vertical-align-anything-with-just-3-lines-of-css/*/
+/* the height of the parent div needs to match the other in the same row (via matchHeight.js) */
+/* That's a lot of work to just vertical-center two lines.*/
+@media (min-width: 767px) {
+	#bignums {
+		position: relative;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+}

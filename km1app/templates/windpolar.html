@@ -1,0 +1,30 @@
+{% set no_navbar = true %}
+{% set no_footer = true %}
+{% extends "layout.html" %}
+{% block title %}Apparent Wind{% endblock %}
+{% block content %}
+<link href="{{ url_for('static',filename='unica.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ url_for('static',filename='windpolar.css') }}" rel="stylesheet" type="text/css">
+
+<!--highcharts API: http://api.highcharts.com/highcharts/chart-->
+<div class="container">
+	<div class="row table-row">
+		<div class="col-xs-10 col-xs-offset-1 col-sm-7 col-sm-offset-0 box">
+			<div id="winddirection"></div>
+		</div>
+		
+		<div class="col-xs-10 col-xs-offset-1 col-sm-5 col-sm-offset-0 box">
+			<div id="bignums" style="font-family: 'Unica One'; font-size: 4em;">
+				<p id="label_windspeed" class='label_bignum text-center'></p>
+				<p id="label_winddirection" class='label_bignum text-center'></p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="{{ url_for('static',filename='highcharts/js/highcharts-more.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='highcharts/js/modules/solid-gauge.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='reconnecting-websocket.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='jquery-match-height/jquery.matchHeight.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='windpolar.js') }}" type="text/javascript"></script>
+{% endblock %}
