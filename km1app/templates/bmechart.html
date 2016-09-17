@@ -24,22 +24,17 @@
 var chart;
 
 function addpoint(d) {
-	var window_size = 3*24*3600;
-	var t = d['t'];
-	var p = d['p'];
-	var rh = d['rh'];
+	var window_size = 3600;
+	var ts = d['ts']*1000;
+	var t = d['T'];
+	var p = d['P'];
+	var rh = d['RH'];
 	if (!(chart == null)) {
 		var series = chart.series[0];
 		var shift = series.data.length > window_size;
-		chart.series[0].addPoint([Date.now(),t], true, shift);
-		
-		//series = chart.series[1];
-		//shift = series.data.length > window_size;
-		chart.series[1].addPoint([Date.now(),p], true, shift);
-		
-		//series = chart.series[2];
-		//shift = series.data.length > window_size;
-		chart.series[2].addPoint([Date.now(),rh], true, shift);
+		chart.series[0].addPoint([ts,t],true,shift);
+		chart.series[1].addPoint([ts,p],true,shift);
+		chart.series[2].addPoint([ts,rh],true,shift);
 	}
 }
 
@@ -55,7 +50,7 @@ function is_fresh() {
 		//console.log(Date.now(),max_t,Date.now() - max_t);
 		return (Date.now() - max_t) < 2*60*1000;
 	}
-	console.log("chart not ready");
+	//console.log("chart not ready");
 	return false;
 }
 
@@ -215,7 +210,7 @@ $(function() {
 		},*/
 	});		
 	
-	setInterval(check_liveliness,20*1000);
+	setInterval(check_liveliness,5*60*1000);
 
 });
 
@@ -224,12 +219,20 @@ $(function() {
 var url = "ws://" + String(window.location.host) + ":9000";
 //ws = new WebSocket(url);
 ws = new ReconnectingWebSocket(url);
-ws.onopen = function(evt) { console.log(evt) };
-ws.onclose = function(evt) { console.log("closed") };
+ws.onopen = function(evt) {
+	console.log(evt)
+};
+ws.onclose = function(evt) {
+	console.log("closed")
+};
 ws.onmessage = function(evt) {
 	//console.log(evt.data);
-	var data = JSON.parse(evt.data);
-	addpoint(data);
+	var m = evt.data;
+	var i = m.indexOf(',');
+	if (m.substr(0,i).includes("_BME280")) {
+		var data = JSON.parse(m.substr(i+1));
+		addpoint(data);
+	}
 };
 ws.onerror = function(evt) { console.log("error?") };
 
