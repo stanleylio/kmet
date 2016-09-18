@@ -29,7 +29,7 @@ $(function() {
 				return (Date.now() - max_t) < 2*60*1000;
 			}
 			//console.log("chart not ready");
-			return false;
+			return true;
 		}
 
 		if (is_fresh()) {
@@ -48,10 +48,10 @@ $(function() {
 	//ws = new WebSocket(url);
 	ws = new ReconnectingWebSocket(url);
 	ws.onopen = function(evt) {
-		console.log(evt)
+		//console.log(evt)
 	};
 	ws.onclose = function(evt) {
-		console.log("closed")
+		//console.log("closed")
 	};
 	ws.onmessage = function(evt) {
 		//console.log(evt.data);
@@ -60,6 +60,7 @@ $(function() {
 		if (m.substr(0,i).includes("_BME280")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
+			check_liveliness();
 		}
 	};
 	ws.onerror = function(evt) {
