@@ -28,10 +28,16 @@ $(function () {
 			animation: false
 		},
 		title: {
-			text: 'Apparent Wind Direction'
+			text: 'Apparent Wind Direction',
+			style: {
+				fontSize: '3em',
+			}
 		},
 		subtitle: {
-			text: "Data from Port-side RM Young Anemometer"
+			text: 'Data from Port-side RM Young Anemometer',
+			style: {
+				fontSize: '1.5em',
+			}
 		},
 		pane: {
 			startAngle: 0,
@@ -45,9 +51,17 @@ $(function () {
 			labels: {
 				formatter: function () {
 					if (this.value > 180) {
-						return (360 - this.value) + '\xB0';
+						var s =  (360 - this.value) + '\xB0';
+						if (90 == 360-this.value) {
+							return 'PORT';
+						}
+						return s;
 					}
-					return this.value + '\xB0';
+					var s = this.value + '\xB0';
+					if (90 == this.value) {
+						return 'STBD';
+					}
+					return s;
 					//return this.value + '\xB0';
 					//var dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
 					//return dirs[Math.round(this.value/360*(360/(45/2)))];
@@ -113,7 +127,7 @@ $(function () {
 			
 			$('#label_winddirection').text(dir.toFixed(0) + '\xB0');
 
-			var preferredunit = get_unit();
+			var preferredunit = get_current_setting('apparent_wind_polar_speed_unit');
 			if ('m/s' === preferredunit) {
 				$('#label_windspeed').text(spd.toFixed(1) + ' ' + preferredunit);
 			} else if ('km/h' === preferredunit) {
@@ -131,57 +145,48 @@ $(function () {
 	$('.box').matchHeight();
 
 	function set_daynight(theme) {
-		if ($.inArray(theme,['day','night']) > -1) {
-			var polar = $('#winddirection');
-			if (polar.highcharts() != null) {
-				polar.highcharts().destroy();
-			}
-			$.getScript('/static/' + theme + '1.js',function() {
-				polar.highcharts(chart_options);
-				localStorage.setItem('ultrasonic_anemometer_daynight',theme);
-			});
+		var polar = $('#winddirection');
+		if (polar.highcharts() != null) {
+			polar.highcharts().destroy();
 		}
+		$.getScript('/static/windpolar/' + theme + '1.js',function() {
+			polar.highcharts(chart_options);
+		});
+	}
+	
+	var settings = {};
+	//settings[ID] = [List of Options, index of default choice in List of Options];
+	settings['apparent_wind_polar_speed_unit'] = [['m/s','km/h','kn','mph'],2];
+	settings['apparent_wind_polar_daynight'] = [['day','night'],1];
+	
+	function get_current_setting(name) {
+		var choices = settings[name][0];
+		var default_choice = settings[name][1];
+		var setting = localStorage.getItem(name);
+		if ((setting == null) || ($.inArray(setting,choices) == -1)) {
+			setting = choices[default_choice];
+		}
+		return setting;
+	}
+	
+	// this also writes to localStorage
+	function next_setting(name) {
+		var choices = settings[name][0];
+		var newchoice = choices[(choices.indexOf(get_current_setting(name)) + 1) % choices.length];
+		localStorage.setItem(name,newchoice);	// !!
+		//console.log(newchoice);
+		return newchoice;
 	}
 	
 	$('body').click(function() {
-		var theme = get_daynight();
-		if ('night' === theme) {
-			set_daynight('day');
-		} else {
-			set_daynight('night');
-		}
+		var newchoice = next_setting('apparent_wind_polar_daynight');
+		set_daynight(newchoice);
 	});
 	
-	var units = ['m/s','km/h','kn','mph'];
-	function get_unit() {
-		var unit = localStorage.getItem('ultrasonic_anemometer_speed_unit');
-		if ((unit == null) || ($.inArray(unit,units) == -1)) {
-			unit = units[2];
-		}
-		return unit;
-	}
-	function get_daynight() {
-		var daynight = localStorage.getItem('ultrasonic_anemometer_daynight');
-		if ((daynight == null) || ($.inArray(daynight,['day','night']) == -1)) {
-			daynight = units[0];
-		}
-		return daynight;
-	}
-	
 	$('#label_windspeed').click(function(event) {
-		var preferredunit = get_unit();
-		var newunit = units[(units.indexOf(preferredunit) + 1) % units.length];
-		console.log(newunit);
-		localStorage.setItem('ultrasonic_anemometer_speed_unit',newunit);
+		next_setting('apparent_wind_polar_speed_unit');
 		event.stopPropagation();
 	});
 	
-	$(function() {
-		var theme = get_daynight();
-		set_daynight(theme);
-	});
-	$(function() {
-		set_daynight('night');
-	});
-
+	set_daynight(get_current_setting('apparent_wind_polar_daynight'));
 });

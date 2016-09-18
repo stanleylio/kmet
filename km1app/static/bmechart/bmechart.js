@@ -43,30 +43,6 @@ $(function() {
 		}
 	}
 
-	//var url = "ws://localhost:9000/";
-	var url = "ws://" + String(window.location.host) + ":9000";
-	//ws = new WebSocket(url);
-	ws = new ReconnectingWebSocket(url);
-	ws.onopen = function(evt) {
-		//console.log(evt)
-	};
-	ws.onclose = function(evt) {
-		//console.log("closed")
-	};
-	ws.onmessage = function(evt) {
-		//console.log(evt.data);
-		var m = evt.data;
-		var i = m.indexOf(',');
-		if (m.substr(0,i).includes("_BME280")) {
-			var data = JSON.parse(m.substr(i+1));
-			addpoint(data);
-			check_liveliness();
-		}
-	};
-	ws.onerror = function(evt) {
-		console.log("error?")
-	};
-
 	var t_color = Highcharts.getOptions().colors[2];
 	var p_color = Highcharts.getOptions().colors[0];
 	var rh_color = Highcharts.getOptions().colors[3];
@@ -213,5 +189,29 @@ $(function() {
 		},*/
 	});
 	
+	//var url = "ws://localhost:9000/";
+	var url = "ws://" + String(window.location.host) + ":9000";
+	//ws = new WebSocket(url);
+	ws = new ReconnectingWebSocket(url);
+	ws.onopen = function(evt) {
+		//console.log(evt)
+	};
+	ws.onclose = function(evt) {
+		//console.log("closed")
+	};
+	ws.onmessage = function(evt) {
+		//console.log(evt.data);
+		var m = evt.data;
+		var i = m.indexOf(',');
+		if (m.substr(0,i).includes("_BME280")) {
+			var data = JSON.parse(m.substr(i+1));
+			addpoint(data);
+			check_liveliness();
+		}
+	};
+	ws.onerror = function(evt) {
+		console.log("error?")
+	};
+
 	setInterval(check_liveliness,5*60*1000);
 });

@@ -5,7 +5,7 @@
 
 <div id="container" style="width: 90%; height: 500px; margin: 0 auto; margin-top: 2em; margin-bottom: 3em;"></div>
 
-<div style="width: 60%; margin: 0 auto; color: #E0E0E3">
+<div style="width: 60%; margin: 0 auto; color: #A0A0A0">
 	<p>Live data from a <a href="{{ url_for('static',filename='doc/BST-BME280_DS001-11.pdf')}}" target=_blank>Bosch BME280</a> Temperature, Barometric Pressure and Relative Humidity sensor housed inside the <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target=_blank>electrical box</a> up on the <a href="/faq/#q1" target=_blank>meteorological sensor mast</a>. This sensor is polled once a minute. Data are live from the sensors (not retrieved from log/database).</p>
 	
 	<p>Being inside the electrical box, the sensor is measuring the temperature and humidity inside the box. Pressure measurement, on the other hand, should be the same as barometric pressure since the electrical box is not hermetically sealed.</p>
@@ -13,8 +13,8 @@
 </div>
 
 <script src="{{ url_for('static',filename='reconnecting-websocket.js') }}" type="text/javascript"></script>
-<script src="{{ url_for('static',filename='bmechart.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='bmechart/bmechart.js') }}" type="text/javascript"></script>
 <!--script src="{{ url_for('static',filename='highcharts/js/modules/exporting.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static',filename='highcharts/js/modules/offline-exporting.js') }}" type="text/javascript"></script-->
-<script src="{{ url_for('static',filename='day1.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='bmechart/day1.js') }}" type="text/javascript"></script>
 {% endblock %}

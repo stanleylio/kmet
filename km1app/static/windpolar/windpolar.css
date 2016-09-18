@@ -1,5 +1,5 @@
 body {
-	padding-top: 30px;
+	padding-top: 100px;
 }
 /*http://zerosixthree.se/vertical-align-anything-with-just-3-lines-of-css/*/
 /* the height of the parent div needs to match the other in the same row (via matchHeight.js) */
@@ -10,4 +10,16 @@ body {
 		top: 50%;
 		transform: translateY(-50%);
 	}
+}
+
+@media (min-width: 1000px) {
+	body {
+		padding-top: 10%;
+	}
+	/*#container {
+		margin: 0 auto;
+	  -webkit-box-sizing: border-box;
+		 -moz-box-sizing: border-box;
+			  box-sizing: border-box;
+	}*/
 }
