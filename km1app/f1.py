@@ -17,8 +17,8 @@ def plot():
 def by_sensor_bme280():
     return render_template('bmechart.html')
 
-@app.route('/by_variable/apparent_wind_dashboard/')
-def by_variable_apparent_wind_dashboard():
+@app.route('/by_variable/apparent_wind_polar/')
+def by_variable_apparent_wind_polar():
     return render_template('windpolar.html')
 
 @app.route('/by_variable/apparent_wind_graph/')
