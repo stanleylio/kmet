@@ -1,3 +1,11 @@
+/* functional requirements:
+	show live wind speed and direction
+	indicate if reading is stale
+		turn grayscale, no speed/dir display
+	support custom unit
+	support day/night theme
+	unit and theme shall persist across page load (same device)
+*/
 $(function() {
 	var window_size = 30*60;	// seconds
 	var chart;

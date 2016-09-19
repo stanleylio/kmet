@@ -1,6 +1,7 @@
 $(function () {
 	var pointInterval = 5;
 	var data = [];
+	var last_received = Date.now();
 
 	function ms2kmh(ms) {
 		return ms*3600/1000;
@@ -16,7 +17,9 @@ $(function () {
 		var chart = $('#winddirection').highcharts();
 		if (chart) {
 			var data = Array(Math.floor(360/pointInterval)).fill(0);
-			data[Math.round(dir/pointInterval)] = 1;
+			if (null != dir) {
+				data[Math.round(dir/pointInterval)] = 1;
+			}
 			chart.series[0].setData(data,true);
 		}
 	}
@@ -137,6 +140,8 @@ $(function () {
 			} else if ('mph' === preferredunit) {
 				$('#label_windspeed').text(ms2mph(spd).toFixed(1) + ' ' + preferredunit);
 			}
+			
+			last_received = Date.now();
 		}
 	};
 	ws.onerror = function(evt) { console.log("error?") };
@@ -144,6 +149,23 @@ $(function () {
 	// make the two columns the same height so that the bignum display can be vertically-centered
 	$('.box').matchHeight();
 
+	function check_liveliness() {
+		if ((Date.now() - last_received)/1000 <= 5) {
+			//console.log('fresh');
+			$('body').css("-webkit-filter","");
+			$('body').css("filter","");
+		} else {
+			//console.log('stale');
+			$('body').css("-webkit-filter","grayscale(100%)");
+			$('body').css("filter","grayscale(100%)");
+			$('#label_winddirection').text('');
+			$('#label_windspeed').text('');
+			setdir(null);
+		}
+	}
+
+	setInterval(check_liveliness,5*1000);
+	
 	function set_daynight(theme) {
 		var polar = $('#winddirection');
 		if (polar.highcharts() != null) {
