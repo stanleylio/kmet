@@ -1,18 +1,34 @@
 $(function() {
+	
+	function r2t(R) {
+		var C1 = 0.0010295;
+		var C2 = 0.0002391;
+		var C3 = 0.0000001568;
+		return 1/(C1 + C2*Math.log(R) + C3*(Math.pow(Math.log(R),3))) - 273.15;
+	}
+
+	function v2r(V) {
+		var Vref = 2.5;
+		if (Vref <= V) {
+			return NaN;
+		}
+		return 10e3*V/(Vref-V);
+	}
+	
 	var chart;
 
 	function addpoint(d) {
 		if (!(chart == null)) {
 			var window_size = 3600;
 			var ts = d['ts']*1000;
-			var t = d['T'];
-			var p = d['P'];
-			var rh = d['RH'];
+			var ir_mV = d['ir_mV'];
+			var t_case_V = d['t_case_V'];
+			var t_dome_V = d['t_dome_V'];
 			var series = chart.series[0];
 			var shift = series.data.length > window_size;
-			chart.series[0].addPoint([ts,t],true,shift);
-			chart.series[1].addPoint([ts,p],true,shift);
-			chart.series[2].addPoint([ts,rh],true,shift);
+			chart.series[0].addPoint([ts,ir_mV],true,shift);
+			chart.series[1].addPoint([ts,r2t(v2r(t_case_V))],true,shift);
+			chart.series[2].addPoint([ts,r2t(v2r(t_dome_V))],true,shift);
 		}
 	}
 
@@ -43,9 +59,12 @@ $(function() {
 		}
 	}
 
-	var t_color = Highcharts.getOptions().colors[2];
-	var p_color = Highcharts.getOptions().colors[0];
-	var rh_color = Highcharts.getOptions().colors[3];
+	//var color1 = Highcharts.getOptions().colors[2];
+	var color1 = 'red';
+	//var color2 = Highcharts.getOptions().colors[0];
+	var color2 = 'orange';
+	//var color3 = Highcharts.getOptions().colors[3];
+	var color3 = 'gold';
 
 	chart = new Highcharts.Chart({
 		chart: {
@@ -58,10 +77,10 @@ $(function() {
 			animation: false
 		},
 		title: {
-			text: 'Temperature, Barometric Pressure and Relative Humidity'
+			text: 'Longwave Irradiance (IR)'
 		},
 		/*subtitle: {
-			text: 'Live data from a Bosch BME280 in the electrical box on the met. mast'
+			text: 'Data from a Precision Infrared Radiometer (Pyrgeometer, PIR)',
 			style: {
 				fontSize: '1.5em'
 			}
@@ -81,48 +100,48 @@ $(function() {
 			minPadding: 0.2,
 			maxPadding: 0.2,
 			labels: {
-				format: '{value}°C',
+				format: '{value}',
 				style: {
-					color: t_color
+					color: color1
 				}
 			},
 			title: {
-				text: 'Temperature',
+				text: 'Irradiance (W/m^2) (CALIBRATION FACTOR?)',
 				margin: 30,
 				style: {
 					fontSize: '2em',
-					color: t_color
+					color: color1
 				}
 			}
 		},{
 			gridLineWidth: 0,
 			labels: {
-				format: '{value}kPa',
+				format: '{value}°C',
 				style: {
-					color: p_color
+					color: color2
 				}
 			},
 			title: {
-				text: 'Barometric Pressure',
+				text: 'Case Temperature',
 				style: {
 					fontSize: '2em',
-					color: p_color
+					color: color2
 				}
 			},
 			opposite: true
 		},{
 			gridLineWidth: 0,
 			labels: {
-				format: '{value}%',
+				format: '{value}°C',
 				style: {
-					color: rh_color
+					color: color3
 				}
 			},
 			title: {
-				text: 'Relative Humidity',
+				text: 'Dome Temperature',
 				style: {
 					fontSize: '2em',
-					color: rh_color
+					color: color3
 				}
 			},
 			opposite: true
@@ -131,33 +150,42 @@ $(function() {
 			shared: true
 		},
 		series: [{
-			name: 'Temperature',
+			name: 'IR',
 			data: [],
 			yAxis: 0,
-			color: t_color,
+			color: color1,
 			lineWidth: 3,
 			tooltip: {
-				valueSuffix: ' °C'
+				valueSuffix: ' W/m^2'
+			},
+			marker: {
+				enabled: false
 			}
 		},{
-			name: 'Barometric Pressure',
+			name: 'Case Temperature',
 			data: [],
 			yAxis: 1,
-			color: p_color,
+			color: color2,
 			lineWidth: 3,
 			dashStyle: 'shortdash',
 			tooltip: {
-				valueSuffix: ' kPa'
+				valueSuffix: ' °C'
+			},
+			marker: {
+				enabled: false
 			}
 		},{
-			name: 'Relative Humidity',
+			name: 'Dome Temperature',
 			data: [],
 			yAxis: 2,
-			color: rh_color,
+			color: color3,
 			lineWidth: 3,
 			dashStyle: 'shortdot',
 			tooltip: {
-				valueSuffix: ' %'
+				valueSuffix: ' °C'
+			},
+			marker: {
+				enabled: false
 			}
 		}],
 		tooltip: {
@@ -215,7 +243,7 @@ $(function() {
 		//console.log(evt.data);
 		var m = evt.data;
 		var i = m.indexOf(',');
-		if (m.substr(0,i).includes("_BME280")) {
+		if (m.substr(0,i).includes("_PIR")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
 			check_liveliness();

@@ -9,9 +9,17 @@ from json import dumps
 def route_index():
     return render_template('index.html')
 
-@app.route('/plot/')
-def plot():
-    return render_template('bmechart.html')
+@app.route('/by_sensor/par/')
+def by_sensor_par():
+    return render_template('par.html')
+
+@app.route('/by_sensor/pir/')
+def by_sensor_pir():
+    return render_template('pir.html')
+
+@app.route('/by_sensor/psp/')
+def by_sensor_psp():
+    return render_template('psp.html')
 
 @app.route('/by_sensor/bme280/')
 def by_sensor_bme280():

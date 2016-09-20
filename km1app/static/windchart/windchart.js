@@ -9,7 +9,8 @@
 $(function() {
 	var window_size = 30*60;	// seconds
 	var chart;
-	var utcoffset = -(new Date()).getTimezoneOffset()*60*1000;
+	//var utcoffset = -(new Date()).getTimezoneOffset()*60*1000;
+	var utcoffset = 0;		// it's a ship, use UTC
 
 	function ms2knot(ms) {
 		return ms*1.94384;
@@ -88,7 +89,13 @@ $(function() {
 		xAxis: {
 			type: 'datetime',
 			tickPixelInterval: 150,
-			minRange: 1000
+			minRange: 1000,
+			title: {
+				text: 'UTC',
+				style: {
+					fontSize: '2em'
+				}
+			}
 		},
 		yAxis: {
 			minPadding: 0.2,
@@ -140,7 +147,7 @@ $(function() {
 		tooltip: {
 			enabled: false
 		},
-		/*legend: {
+		legend: {
 			enabled: true,
 			layout: 'vertical',
 			floating: true,
@@ -148,11 +155,11 @@ $(function() {
 			verticalAlign: 'top',
 			y: 60,
 			x: 100,
-			//backgroundColor: '#ffffff',
+			backgroundColor: '#ffffff',
 			itemStyle: {
-				color: '#E0E0E0',
+				fontSize: '1em'
 			}
-		},*/
+		},
 		credits: {
 			enabled: false
 		},

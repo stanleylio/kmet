@@ -5,14 +5,10 @@ $(function() {
 		if (!(chart == null)) {
 			var window_size = 3600;
 			var ts = d['ts']*1000;
-			var t = d['T'];
-			var p = d['P'];
-			var rh = d['RH'];
+			var par_V = d['par_V'];
 			var series = chart.series[0];
 			var shift = series.data.length > window_size;
-			chart.series[0].addPoint([ts,t],true,shift);
-			chart.series[1].addPoint([ts,p],true,shift);
-			chart.series[2].addPoint([ts,rh],true,shift);
+			chart.series[0].addPoint([ts,par_V],true,shift);
 		}
 	}
 
@@ -43,9 +39,7 @@ $(function() {
 		}
 	}
 
-	var t_color = Highcharts.getOptions().colors[2];
-	var p_color = Highcharts.getOptions().colors[0];
-	var rh_color = Highcharts.getOptions().colors[3];
+	var color1 = 'green';
 
 	chart = new Highcharts.Chart({
 		chart: {
@@ -58,10 +52,10 @@ $(function() {
 			animation: false
 		},
 		title: {
-			text: 'Temperature, Barometric Pressure and Relative Humidity'
+			text: 'Photosynthetically Active Radiation'
 		},
 		/*subtitle: {
-			text: 'Live data from a Bosch BME280 in the electrical box on the met. mast'
+			text: 'subtitle',
 			style: {
 				fontSize: '1.5em'
 			}
@@ -81,90 +75,41 @@ $(function() {
 			minPadding: 0.2,
 			maxPadding: 0.2,
 			labels: {
-				format: '{value}°C',
+				format: '{value}',
 				style: {
-					color: t_color
+					color: color1
 				}
 			},
 			title: {
-				text: 'Temperature',
+				text: 'Irradiance (W/m^2) (CALIBRATION FACTOR?)',
 				margin: 30,
 				style: {
 					fontSize: '2em',
-					color: t_color
+					color: color1
 				}
 			}
-		},{
-			gridLineWidth: 0,
-			labels: {
-				format: '{value}kPa',
-				style: {
-					color: p_color
-				}
-			},
-			title: {
-				text: 'Barometric Pressure',
-				style: {
-					fontSize: '2em',
-					color: p_color
-				}
-			},
-			opposite: true
-		},{
-			gridLineWidth: 0,
-			labels: {
-				format: '{value}%',
-				style: {
-					color: rh_color
-				}
-			},
-			title: {
-				text: 'Relative Humidity',
-				style: {
-					fontSize: '2em',
-					color: rh_color
-				}
-			},
-			opposite: true
 		}],
 		tooltip: {
 			shared: true
 		},
 		series: [{
-			name: 'Temperature',
+			name: 'PAR',
 			data: [],
 			yAxis: 0,
-			color: t_color,
+			color: color1,
 			lineWidth: 3,
 			tooltip: {
-				valueSuffix: ' °C'
-			}
-		},{
-			name: 'Barometric Pressure',
-			data: [],
-			yAxis: 1,
-			color: p_color,
-			lineWidth: 3,
-			dashStyle: 'shortdash',
-			tooltip: {
-				valueSuffix: ' kPa'
-			}
-		},{
-			name: 'Relative Humidity',
-			data: [],
-			yAxis: 2,
-			color: rh_color,
-			lineWidth: 3,
-			dashStyle: 'shortdot',
-			tooltip: {
-				valueSuffix: ' %'
+				valueSuffix: ' W/m^2'
+			},
+			marker: {
+				enabled: false
 			}
 		}],
 		tooltip: {
 			enabled: true
 		},
 		legend: {
-			enabled: true,
+			enabled: false,
 			layout: 'vertical',
 			floating: true,
 			align: 'left',
@@ -215,7 +160,7 @@ $(function() {
 		//console.log(evt.data);
 		var m = evt.data;
 		var i = m.indexOf(',');
-		if (m.substr(0,i).includes("_BME280")) {
+		if (m.substr(0,i).includes("_PAR")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
 			check_liveliness();

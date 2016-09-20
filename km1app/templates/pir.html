@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}PIR{% endblock %}
+{% block content %}
+<link href="{{ url_for('static',filename='unica.css') }}" rel="stylesheet" type="text/css">
+
+<div id="container" style="width: 90%; height: 500px; margin: 0 auto; margin-top: 2em; margin-bottom: 3em;"></div>
+
+<div style="width: 60%; margin: 0 auto; color: #A0A0A0">
+	<p>Live data from a Precision Infrared Radiometer (Pyrgeometer, PIR). The sensor is up on the <a href="/faq/#q1" target=_blank>meteorological sensor mast</a>.</p>
+	<p>The Eppley PIR contains two thermistors in addition to the thermopile. Temperature readings from the thermistors can be used to compensate for error introduced by the case and dome termperature.</p>
+	<p>This sensor is polled every 30 seconds. Data are live from the sensors (not retrieved from log/database).</p>
+	
+	<p>Individual time series can be toggled ON/OFF by clicking the corresponding legend. This page turns grayscale if the data is stale.</p>
+</div>
+
+<script src="{{ url_for('static',filename='reconnecting-websocket.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='pir/pir.js') }}" type="text/javascript"></script>
+<!--script src="{{ url_for('static',filename='highcharts/js/modules/exporting.js') }}" type="text/javascript"></script>
+<script src="{{ url_for('static',filename='highcharts/js/modules/offline-exporting.js') }}" type="text/javascript"></script-->
+<script src="{{ url_for('static',filename='pir/day1.js') }}" type="text/javascript"></script>
+{% endblock %}
