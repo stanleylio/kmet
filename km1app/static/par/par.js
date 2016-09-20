@@ -52,7 +52,7 @@ $(function() {
 			animation: false
 		},
 		title: {
-			text: 'Photosynthetically Active Radiation'
+			text: 'Photosynthetically Active Radiation (PAR)'
 		},
 		/*subtitle: {
 			text: 'subtitle',

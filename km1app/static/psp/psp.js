@@ -52,7 +52,7 @@ $(function() {
 			animation: false
 		},
 		title: {
-			text: 'Global Shortwave Irradiance'
+			text: 'Global Shortwave Irradiance (PSP)'
 		},
 		/*subtitle: {
 			text: 'subtitle',
