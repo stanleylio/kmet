@@ -3,16 +3,6 @@ $(function () {
 	var data = [];
 	var last_received = Date.now();
 
-	function ms2kmh(ms) {
-		return ms*3600/1000;
-	}
-	function ms2knot(ms) {
-		return ms*1.94384;
-	}
-	function ms2mph(ms) {
-		return ms*2.23694;
-	}
-
 	function setdir(dir) {
 		var chart = $('#winddirection').highcharts();
 		if (chart) {
@@ -176,10 +166,11 @@ $(function () {
 		});
 	}
 	
+	
 	var settings = {};
 	//settings[ID] = [List of Options, index of default choice in List of Options];
 	settings['apparent_wind_polar_speed_unit'] = [['m/s','km/h','kn','mph'],2];
-	settings['apparent_wind_polar_daynight'] = [['day','night'],1];
+	settings['apparent_wind_polar_daynight'] = [['day','night'],0];
 	
 	function get_current_setting(name) {
 		var choices = settings[name][0];

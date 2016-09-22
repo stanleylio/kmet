@@ -13,22 +13,7 @@ $(function() {
 	}
 
 	function check_liveliness() {
-		function is_fresh() {
-			if (!(chart == null)) {
-				var max_t = 0;
-				for (var i = 0; i < chart.series[0].data.length; i++) {
-					var x = chart.series[0].data[i].x;
-					if (x > max_t) {
-						max_t = x;
-					}
-				}
-				return (Date.now() - max_t) < 2*60*1000;
-			}
-			//console.log("chart not ready");
-			return true;
-		}
-
-		if (is_fresh()) {
+		if (is_fresh(chart,120)) {
 			//console.log('fresh');
 			$('body').css("-webkit-filter","");
 			$('body').css("filter","");

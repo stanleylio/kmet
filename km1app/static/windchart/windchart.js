@@ -12,10 +12,6 @@ $(function() {
 	//var utcoffset = -(new Date()).getTimezoneOffset()*60*1000;
 	var utcoffset = 0;		// it's a ship, use UTC
 
-	function ms2knot(ms) {
-		return ms*1.94384;
-	}
-
 	function addpoint(data,idx) {
 		if (!(chart == null)) {
 			var series = chart.series[idx];
@@ -33,28 +29,7 @@ $(function() {
 	}
 
 	function check_liveliness() {
-		function cal_time_range(data) {
-			var min_t = 0;
-			var max_t = 0;
-			for (var i = 0; i < data.length; i++) {
-				var x = data[i].x;
-				if (x < min_t) {
-					min_t = x;
-				} else if (x > max_t) {
-					max_t = x;
-				}
-			}
-			return [min_t,max_t];
-		}
-		function is_fresh() {
-			if (!(chart == null)) {
-				var range = cal_time_range(chart.series[0].data);
-				return (Date.now() + utcoffset - range[1]) < 10*1000;
-			}
-			return true;
-		}
-
-		if (is_fresh()) {
+		if (is_fresh(chart,60)) {
 			//console.log('fresh');
 			$('body').css("-webkit-filter","");
 			$('body').css("filter","");
