@@ -21,6 +21,10 @@ def by_sensor_pir():
 def by_sensor_psp():
     return render_template('psp.html')
 
+#@app.route('/by_sensor/ultrasonic')
+#def by_sensor_ultrasonic():
+#    return render_template('ultrasonic.html')
+
 @app.route('/by_sensor/bme280/')
 def by_sensor_bme280():
     return render_template('bmechart.html')
