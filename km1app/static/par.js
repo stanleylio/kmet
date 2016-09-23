@@ -62,7 +62,8 @@ $(function() {
 			labels: {
 				format: '{value}',
 				style: {
-					color: color1
+					color: color1,
+					fontSize: '1.5em'
 				}
 			},
 			title: {
@@ -131,6 +132,20 @@ $(function() {
 		},*/
 	});
 	
+	// preload historical data (past one hour)
+	var begin = Date.now()/1000 - 3600;
+	var url = '/data/1/PAR.json?begin=' + begin;
+	//console.log(url);
+	$.getJSON(url,function(data) {
+		//console.log(data);
+		if (!(chart == null)) {
+			var tmp = _.zip(data['ts'],data['par_V']);
+			for (var i = 0; i < tmp.length; i++) {
+				addpoint({'ts':tmp[i][0],'par_V':tmp[i][1]});
+			}
+		}
+	});
+	
 	//var url = "ws://localhost:9000/";
 	var url = "ws://" + String(window.location.host) + ":9000";
 	//ws = new WebSocket(url);
@@ -155,5 +170,5 @@ $(function() {
 		console.log("error?")
 	};
 
-	setInterval(check_liveliness,5*60*1000);
+	setInterval(check_liveliness,2*60*1000);
 });

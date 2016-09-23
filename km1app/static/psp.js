@@ -1,32 +1,14 @@
 $(function() {
 	var chart;
 
-	function r2t(R) {
-		var C1 = 0.0010295;
-		var C2 = 0.0002391;
-		var C3 = 0.0000001568;
-		return 1/(C1 + C2*Math.log(R) + C3*(Math.pow(Math.log(R),3))) - 273.15;
-	}
-	function v2r(V) {
-		var Vref = 2.5;
-		if (Vref <= V) {
-			return NaN;
-		}
-		return 10e3*V/(Vref-V);
-	}
-	
 	function addpoint(d) {
 		if (!(chart == null)) {
 			var window_size = 3600;
 			var ts = d['ts']*1000;
-			var ir_mV = d['ir_mV'];
-			var t_case_V = d['t_case_V'];
-			var t_dome_V = d['t_dome_V'];
+			var psp_mV = d['psp_mV'];
 			var series = chart.series[0];
 			var shift = series.data.length > window_size;
-			chart.series[0].addPoint([ts,ir_mV],true,shift);
-			chart.series[1].addPoint([ts,r2t(v2r(t_case_V))],true,shift);
-			chart.series[2].addPoint([ts,r2t(v2r(t_dome_V))],true,shift);
+			chart.series[0].addPoint([ts,psp_mV],true,shift);
 		}
 	}
 
@@ -42,12 +24,7 @@ $(function() {
 		}
 	}
 
-	//var color1 = Highcharts.getOptions().colors[2];
-	var color1 = 'red';
-	//var color2 = Highcharts.getOptions().colors[0];
-	var color2 = 'orange';
-	//var color3 = Highcharts.getOptions().colors[3];
-	var color3 = 'gold';
+	var color1 = 'purple';
 
 	chart = new Highcharts.Chart({
 		chart: {
@@ -60,10 +37,10 @@ $(function() {
 			animation: false
 		},
 		title: {
-			text: 'Longwave Irradiance (IR)'
+			text: 'Global Shortwave Irradiance (PSP)'
 		},
 		/*subtitle: {
-			text: 'Data from a Precision Infrared Radiometer (Pyrgeometer, PIR)',
+			text: 'subtitle',
 			style: {
 				fontSize: '1.5em'
 			}
@@ -96,44 +73,12 @@ $(function() {
 					color: color1
 				}
 			}
-		},{
-			gridLineWidth: 0,
-			labels: {
-				format: '{value}°C',
-				style: {
-					color: color2
-				}
-			},
-			title: {
-				text: 'Case Temperature',
-				style: {
-					fontSize: '2em',
-					color: color2
-				}
-			},
-			opposite: true
-		},{
-			gridLineWidth: 0,
-			labels: {
-				format: '{value}°C',
-				style: {
-					color: color3
-				}
-			},
-			title: {
-				text: 'Dome Temperature',
-				style: {
-					fontSize: '2em',
-					color: color3
-				}
-			},
-			opposite: true
 		}],
 		tooltip: {
 			shared: true
 		},
 		series: [{
-			name: 'IR',
+			name: 'PSP',
 			data: [],
 			yAxis: 0,
 			color: color1,
@@ -144,38 +89,12 @@ $(function() {
 			marker: {
 				enabled: false
 			}
-		},{
-			name: 'Case Temperature',
-			data: [],
-			yAxis: 1,
-			color: color2,
-			lineWidth: 3,
-			dashStyle: 'shortdash',
-			tooltip: {
-				valueSuffix: ' °C'
-			},
-			marker: {
-				enabled: false
-			}
-		},{
-			name: 'Dome Temperature',
-			data: [],
-			yAxis: 2,
-			color: color3,
-			lineWidth: 3,
-			dashStyle: 'shortdot',
-			tooltip: {
-				valueSuffix: ' °C'
-			},
-			marker: {
-				enabled: false
-			}
 		}],
 		tooltip: {
 			enabled: true
 		},
 		legend: {
-			enabled: true,
+			enabled: false,
 			layout: 'vertical',
 			floating: true,
 			align: 'left',
@@ -212,6 +131,20 @@ $(function() {
 		},*/
 	});
 	
+	// preload historical data (past one hour)
+	var begin = Date.now()/1000 - 3600;
+	var url = '/data/1/PSP.json?begin=' + begin;
+	//console.log(url);
+	$.getJSON(url,function(data) {
+		//console.log(data);
+		if (!(chart == null)) {
+			var tmp = _.zip(data['ts'],data['psp_mV']);
+			for (var i = 0; i < tmp.length; i++) {
+				addpoint({'ts':tmp[i][0],'psp_mV':tmp[i][1]});
+			}
+		}
+	});
+	
 	//var url = "ws://localhost:9000/";
 	var url = "ws://" + String(window.location.host) + ":9000";
 	//ws = new WebSocket(url);
@@ -226,7 +159,7 @@ $(function() {
 		//console.log(evt.data);
 		var m = evt.data;
 		var i = m.indexOf(',');
-		if (m.substr(0,i).includes("_PIR")) {
+		if (m.substr(0,i).includes("_PSP")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
 			check_liveliness();

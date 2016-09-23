@@ -185,5 +185,5 @@ $(function() {
 		console.log("error?")
 	};
 	
-	setInterval(check_liveliness,5*1000);
+	setInterval(check_liveliness,2*60*1000);
 });

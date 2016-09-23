@@ -112,7 +112,7 @@ Highcharts.theme = {
 		buttonOptions: {
 			symbolStroke: '#DDDDDD',
 			theme: {
-				fill: '#505053'
+				fill: '#FFFFFF'
 			}
 		}
 	},
@@ -180,12 +180,12 @@ Highcharts.theme = {
 	},
 
 	// special colors for some of the demo examples
-	legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+	/*legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
 	background2: '#505053',
 	dataLabelsColor: '#B0B0B3',
 	textColor: '#C0C0C0',
 	contrastTextColor: '#F0F0F3',
-	maskColor: 'rgba(255,255,255,0.3)'
+	maskColor: 'rgba(255,255,255,0.3)'*/
 };
 
 // Apply the theme

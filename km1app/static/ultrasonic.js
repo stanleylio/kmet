@@ -1,23 +1,24 @@
 $(function() {
 	var chart;
-
+	
 	function addpoint(d) {
 		if (!(chart == null)) {
 			var window_size = 3600;
 			var ts = d['ts']*1000;
-			var t = d['T'];
-			var p = d['P'];
-			var rh = d['RH'];
-			var series = chart.series[0];
-			var shift = series.data.length > window_size;
-			chart.series[0].addPoint([ts,t],true,shift);
-			chart.series[1].addPoint([ts,p],true,shift);
-			chart.series[2].addPoint([ts,rh],true,shift);
+			var apparent_speed_mps = d['apparent_speed_mps'];
+			var apparent_direction_deg = d['apparent_direction_deg'];
+			
+			var shift = _.maxBy(chart.series,function(v) {
+				return v.data.length;
+			}) > window_size;
+			//var shift = chart.series[0].data.length > window_size;
+			chart.series[0].addPoint([ts,apparent_speed_mps],true,shift);
+			chart.series[1].addPoint([ts,apparent_direction_deg],true,shift);
 		}
 	}
 
 	function check_liveliness() {
-		if (is_fresh(chart,120)) {
+		if (is_fresh(chart,60)) {
 			//console.log('fresh');
 			$('body').css("-webkit-filter","");
 			$('body').css("filter","");
@@ -28,9 +29,8 @@ $(function() {
 		}
 	}
 
-	var t_color = Highcharts.getOptions().colors[2];
-	var p_color = Highcharts.getOptions().colors[0];
-	var rh_color = Highcharts.getOptions().colors[3];
+	var color1 = '#AD0062';
+	var color2 = '#87CA00';
 
 	chart = new Highcharts.Chart({
 		chart: {
@@ -43,14 +43,14 @@ $(function() {
 			animation: false
 		},
 		title: {
-			text: 'Temperature, Barometric Pressure and Relative Humidity'
+			text: 'Apparent Wind'
 		},
-		/*subtitle: {
-			text: 'Live data from a Bosch BME280 in the electrical box on the met. mast'
+		subtitle: {
+			text: 'Data from the RM Young 85106 ultrasonic anemometer',
 			style: {
 				fontSize: '1.5em'
 			}
-		},*/
+		},
 		xAxis: {
 			type: 'datetime',
 			tickPixelInterval: 150,
@@ -66,48 +66,36 @@ $(function() {
 			minPadding: 0.2,
 			maxPadding: 0.2,
 			labels: {
-				format: '{value}°C',
+				format: '{value}m/s',
 				style: {
-					color: t_color
+					color: color1,
+					fontSize: '1.5em'
 				}
 			},
 			title: {
-				text: 'Temperature',
+				text: 'Apparent Wind Speed',
 				margin: 30,
 				style: {
 					fontSize: '2em',
-					color: t_color
+					color: color1
 				}
 			}
 		},{
+			minRange: 0,
+			maxRange: 360,
 			gridLineWidth: 0,
 			labels: {
-				format: '{value}kPa',
+				format: '{value}°',
 				style: {
-					color: p_color
+					color: color2,
+					fontSize: '1.5em'
 				}
 			},
 			title: {
-				text: 'Barometric Pressure',
+				text: 'Apparent Wind Direction',
 				style: {
 					fontSize: '2em',
-					color: p_color
-				}
-			},
-			opposite: true
-		},{
-			gridLineWidth: 0,
-			labels: {
-				format: '{value}%',
-				style: {
-					color: rh_color
-				}
-			},
-			title: {
-				text: 'Relative Humidity',
-				style: {
-					fontSize: '2em',
-					color: rh_color
+					color: color2
 				}
 			},
 			opposite: true
@@ -116,33 +104,29 @@ $(function() {
 			shared: true
 		},
 		series: [{
-			name: 'Temperature',
+			name: 'Speed',
 			data: [],
 			yAxis: 0,
-			color: t_color,
+			color: color1,
 			lineWidth: 3,
 			tooltip: {
-				valueSuffix: ' °C'
+				valueSuffix: ' m/s'
+			},
+			marker: {
+				enabled: false
 			}
 		},{
-			name: 'Barometric Pressure',
+			name: 'Direction',
 			data: [],
 			yAxis: 1,
-			color: p_color,
+			color: color2,
 			lineWidth: 3,
 			dashStyle: 'shortdash',
 			tooltip: {
-				valueSuffix: ' kPa'
-			}
-		},{
-			name: 'Relative Humidity',
-			data: [],
-			yAxis: 2,
-			color: rh_color,
-			lineWidth: 3,
-			dashStyle: 'shortdot',
-			tooltip: {
-				valueSuffix: ' %'
+				valueSuffix: ' °'
+			},
+			marker: {
+				enabled: false
 			}
 		}],
 		tooltip: {
@@ -200,7 +184,7 @@ $(function() {
 		//console.log(evt.data);
 		var m = evt.data;
 		var i = m.indexOf(',');
-		if (m.substr(0,i).includes("_BME280")) {
+		if (m.substr(0,i).includes("_UltrasonicWind")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
 			check_liveliness();
@@ -210,5 +194,5 @@ $(function() {
 		console.log("error?")
 	};
 
-	setInterval(check_liveliness,5*60*1000);
+	setInterval(check_liveliness,60*1000);
 });
