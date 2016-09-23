@@ -18,7 +18,7 @@ $(function () {
 		chart: {
 			polar: true,
 			type: 'column',
-			animation: false
+			animation: false,
 		},
 		title: {
 			text: 'Apparent Wind Direction',

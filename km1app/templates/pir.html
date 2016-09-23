@@ -2,8 +2,9 @@
 {% block title %}Longwave Irradiance (PIR){% endblock %}
 {% block content %}
 <link href="{{ url_for('static',filename='unica.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ url_for('static',filename='common.css') }}" rel="stylesheet" type="text/css">
 
-<div id="container" style="width: 90%; height: 500px; margin: 0 auto; margin-top: 2em; margin-bottom: 3em;"></div>
+<div id="container"></div>
 
 <div style="width: 60%; margin: 0 auto; color: #A0A0A0">
 	<p>Live data from a Precision Infrared Radiometer (Pyrgeometer, PIR). The sensor is up on the <a href="/faq/#q1" target=_blank>meteorological sensor mast</a>.</p>
