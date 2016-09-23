@@ -59,6 +59,10 @@ def data1(sensor):
     else:
         return 'too low on the totem pole'
 
+@app.route('/meta/')
+def meta():
+    return render_template('meta.html')
+
 @app.route('/info/')
 def info():
     return render_template('info.html')

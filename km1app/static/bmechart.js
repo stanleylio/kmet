@@ -186,6 +186,20 @@ $(function() {
 		},*/
 	});
 	
+	// preload historical data (past one hour)
+	var begin = Date.now()/1000 - 3600;
+	var url = '/data/1/BME280.json?begin=' + begin;
+	//console.log(url);
+	$.getJSON(url,function(data) {
+		//console.log(data);
+		if (!(chart == null)) {
+			var tmp = _.zip(data['ts'],data['T'],data['P'],data['RH']);
+			for (var i = 0; i < tmp.length; i++) {
+				addpoint({'ts':tmp[i][0],'T':tmp[i][1],'P':tmp[i][2],'RH':tmp[i][3]});
+			}
+		}
+	});
+	
 	//var url = "ws://localhost:9000/";
 	var url = "ws://" + String(window.location.host) + ":9000";
 	//ws = new WebSocket(url);

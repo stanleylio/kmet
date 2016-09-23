@@ -27,7 +27,7 @@ $(function () {
 			}
 		},
 		subtitle: {
-			text: 'Data from Port-side RM Young Anemometer',
+			text: 'Data from the Ultrasonic Anemometer 85106',
 			style: {
 				fontSize: '1.5em',
 			}
@@ -112,7 +112,7 @@ $(function () {
 		//console.log(evt.data);
 		var m = evt.data;
 		var i = m.indexOf(',');
-		if (m.substr(0,i).includes("_PortWind")) {
+		if (m.substr(0,i).includes("_UltrasonicWind")) {
 			var data = JSON.parse(m.substr(i+1));
 			var dir = data['apparent_direction_deg'];
 			var spd = data['apparent_speed_mps'];
