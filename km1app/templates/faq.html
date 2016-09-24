@@ -8,26 +8,44 @@
 				<h2>FAQ</h2>
 
 				<a name="q1"></a>
-				<h3>What is this webpage?</h3>
+				<h3>What is this?</h3>
 				<p>met. mast upgrade... blah. for details, see this doc.</p>
 				
 				<a name="q2"></a>
 				<h3>Where is the "met. mast"? Where are the sensors?</h3>
-				<figure><img src="/static/img/metmastonkm.jpg" class="img-responsive img-rounded" alt="Yes that's a real rainbow."></figure>
+				<div class="row">
+					<div class="col-md-6 col-md-offset-0">
+						<figure><img src="/static/img/metmastonkm.jpg" class="img-responsive img-rounded" alt="Yes that's a real rainbow."></figure>
+					</div>
+				</div>
 				
 				<a name="q3"></a>
-				<h3>about this whole thing...</h3>
-				<p>logging is top priority, visualization is optional. the two parts loosely decoupled, and one can be run without the other.</p>
+				<h3>What is the data source for the real-time plots?</h3>
+				<p>Data are live from the sensors rather than from log/database. However, about an hour worth of historical data from database is pulled from the database to initialize each plot.</p>
 				
 				<a name="q4"></a>
+				<h3>about this whole thing...</h3>
+				<p>logging is top priority, visualization is optional. the two parts loosely decoupled, and one can be run without the other; the electrical box is a bird nest... the chart room cabinet is another. no one knows the wiring, and stages of processing made to the data</p>
+				
+				<a name="q5"></a>
 				<h3>Where does variable X come from?</h3>
-				<p>.</p>
+				<p>see flow chart...</p>
 				
-				<p>rationale: report mV, or report W/m^2? the former is useless for visualization and debugging, but the latter involve calibration factor and calculation. these are assumptions and factors that change all the time. there is no way to enforce that "marine tech shall update the calibration factor every time a sensor is swapped"</p>
+				<a name="q6"></a>
+				<h3>"Stale"?</h3>
+				<p>at least two types of "stale":</p>
+				<ul>
+					<li>logger not getting new reading (e.g. sensor down, logger process crashed)</li>
+					<li>connection to web server lost</li>
+				</ul>
+				<p>real-time plots check the first kind; windpolar checks the second kind</p>
 				
-				<p>Where is the box? I'm in the electrical box up on the met. mast. [picture goes here, inside and outside]</p>
+				<h3>more stuff...</h3>
+				<p>rationale: report mV, or report W/m^2? the former is useless for visualization and debugging, but the latter involves post-processing which involves calibration factor and conversion formula (approximation). these are assumptions and factors that change all the time. there is no way to enforce that "marine tech shall update the calibration factor every time a sensor is swapped"</p>
 				
-				<p>What's in the box? A Beaglebone Black single-board computer running Debian.</p>
+				<p>Where is the box? in the electrical box up on the met. mast. [picture goes here, inside and outside]</p>
+				
+				<p>What's in the box? A Beaglebone Black single-board computer running Debian. wire terminals, 12V lead-acid battery backup (with AC power), RS232-to-fiber converter (5V)</p>
 				
 				<h3>"The page turns grayscale even though new data are coming in."</h3>
 				<p>The clock of your device might be out of sync.</p>

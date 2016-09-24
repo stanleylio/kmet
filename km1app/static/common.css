@@ -1,0 +1,8 @@
+#container {
+	width: 90%;
+	min-width: 600px;
+	height: 500px;
+	margin: 0 auto;
+	margin-top: 2em;
+	margin-bottom: 3em;
+}
