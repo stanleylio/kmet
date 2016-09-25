@@ -36,3 +36,15 @@ function is_fresh(chart,bestbefore) {
 	}
 	return false;
 }
+
+function check_liveliness(chart,timeout) {
+	if (is_fresh(chart,timeout)) {
+		//console.log('fresh');
+		$('body').css("-webkit-filter","");
+		$('body').css("filter","");
+	} else {
+		//console.log('stale');
+		$('body').css("-webkit-filter","grayscale(100%)");
+		$('body').css("filter","grayscale(100%)");
+	}
+}

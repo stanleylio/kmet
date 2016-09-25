@@ -1,4 +1,11 @@
 $(function() {
+	var window_size = 1000;	// max # of samples per series (some can be shorter than other)
+	var preload = 3600;		// populate plot with data collected in the past "preload" seconds
+
+	// 'ts' is implied - we are dealing with time series here, of course there's always a timestamp column
+	var fields = ['ir_mV','t_case_V','t_dome_V'];
+	//var convs = [function() {}, function() {}, function() {}, function() {}];
+	
 	var chart;
 
 	function r2t(R) {
@@ -15,30 +22,34 @@ $(function() {
 		return 10e3*V/(Vref-V);
 	}
 	
+	// give a sample ([timestamp,field1,field2,field3...]), apply
+	// any conversion (unit etc.) needed
+	function conv(s) {
+		return [
+			1000*s[0],			// POSIX in seconds, js in milliseconds
+			s[1],				// TOOD missing calibration factor
+			r2t(v2r(s[2])),		// convert voltage to temperature
+			r2t(v2r(s[3])),
+		];
+	}
+	
 	function addpoint(d) {
 		if (!(chart == null)) {
-			var window_size = 3600;
-			var ts = d['ts']*1000;
-			var ir_mV = d['ir_mV'];
-			var t_case_V = d['t_case_V'];
-			var t_dome_V = d['t_dome_V'];
-			var series = chart.series[0];
-			var shift = series.data.length > window_size;
-			chart.series[0].addPoint([ts,ir_mV],true,shift);
-			chart.series[1].addPoint([ts,r2t(v2r(t_case_V))],true,shift);
-			chart.series[2].addPoint([ts,r2t(v2r(t_dome_V))],true,shift);
-		}
-	}
+			var d = conv([d['ts'],d[fields[0]],d[fields[1]],d[fields[2]]]);
 
-	function check_liveliness() {
-		if (is_fresh(chart,120)) {
-			//console.log('fresh');
-			$('body').css("-webkit-filter","");
-			$('body').css("filter","");
-		} else {
-			//console.log('stale');
-			$('body').css("-webkit-filter","grayscale(100%)");
-			$('body').css("filter","grayscale(100%)");
+			// shift the window if any of the series is longer than window_size
+			// get a list of bools
+			var shifts = _.map(chart.series,function(v,i,c) {
+				return v.data.length > window_size;
+			});
+			// reduce the list of bools to one bool (shift)
+			var shift = _.reduce(shifts,function(acc,val) {
+				return acc || val;
+			});
+
+			$.each(fields,function(k,v) {
+				chart.series[k].addPoint([d[0],d[k+1]],true,shift);
+			});
 		}
 	}
 
@@ -190,45 +201,36 @@ $(function() {
 				fontSize: '1em'
 			}
 		},
-		/*exporting: {
-			sourceWidth: 1600,
-			sourceHeight: 800,
-		},*/
 		credits: {
 			enabled: false
 		},
-		/*plotOptions: {
-			area: {
-				fillColor: {
-					linearGradient: {
-						x1:0,
-						y1:0,
-						x2:0,
-						y2:1
-					},
-					stops: [
-						[0, Highcharts.getOptions().colors[2]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[2]).setOpacity(0).get('rgba')]
-					]
-				}
-			}
-		},*/
 	});
 	
-	// preload historical data (past one hour)
-	var begin = Date.now()/1000 - 3600;
+	// TODO
+	// slowly molding it into a reusale form... all real-time plots share these.
+
+	// preload recent data
+	var begin = Date.now()/1000 - preload;
 	var url = '/data/1/PIR.json?begin=' + begin;
-	//console.log(url);
 	$.getJSON(url,function(data) {
-		//console.log(data);
 		if (!(chart == null)) {
-			var tmp = _.zip(data['ts'],data['ir_mV'],data['t_case_V'],data['t_dome_V']);
-			for (var i = 0; i < tmp.length; i++) {
-				addpoint({'ts':tmp[i][0],'ir_mV':tmp[i][1],'t_case_V':tmp[i][2],'t_dome_V':tmp[i][3]});
-			}
+			// sort by timestamp (Highcharts requires this)
+			var tmp = _.zip(data['ts'],data[fields[0]],data[fields[1]],data[fields[2]]);
+			tmp = tmp.sort(function(a,b) { return a[0] > b[0]; });
+
+			// apply any necessary unit conversion and transformation
+			tmp = _.map(tmp,function(v,i,c) {
+				return conv(v);
+			});
+			
+			// populate plot with data
+			$.each(fields,function(k,v) {
+				chart.series[k].setData(_.map(tmp,function(v,i,c) { return [v[0],v[k+1]]; }),false,false);
+			});
+			chart.redraw();
 		}
 	});
-	
+
 	//var url = "ws://localhost:9000/";
 	var url = "ws://" + String(window.location.host) + ":9000";
 	//ws = new WebSocket(url);
@@ -246,12 +248,12 @@ $(function() {
 		if (m.substr(0,i).includes("_PIR")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
-			check_liveliness();
+			check_liveliness(chart,120);
 		}
 	};
 	ws.onerror = function(evt) {
 		console.log("error?")
 	};
 
-	setInterval(check_liveliness,5*1000);
+	setInterval(function() { check_liveliness(chart,120); },10*1000);
 });

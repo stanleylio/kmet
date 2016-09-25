@@ -6,6 +6,9 @@
 	support day/night theme
 	unit and theme shall persist across page load (same device)
 */
+
+// not so simple. this one takes sample from three topics. TODO
+
 $(function() {
 	var window_size = 30*60;	// seconds
 	var chart;
@@ -173,17 +176,20 @@ $(function() {
 		if (m.substr(0,i).includes("_PortWind")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data,0);
+			check_liveliness(chart,120);
 		} else if (m.substr(0,i).includes("_StarboardWind")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data,1);
+			check_liveliness(chart,120);
 		} else if (m.substr(0,i).includes("_UltrasonicWind")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data,2);
+			check_liveliness(chart,120);
 		}
 	};
 	ws.onerror = function(evt) {
 		console.log("error?")
 	};
 	
-	setInterval(check_liveliness,2*60*1000);
+	setInterval(function() { check_liveliness(chart,120); },10*1000);
 });

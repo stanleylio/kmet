@@ -1,30 +1,34 @@
 $(function() {
+	var window_size = 1000;	// max sample count
+	var preload = 3600;		// seconds
+	
+	var fields = ['T','P','RH'];
+	
 	var chart;
 
+	function conv(s) {
+		return [
+			1000*s[0],
+			s[1],
+			s[2],
+			s[3],
+		];
+	}
+	
 	function addpoint(d) {
 		if (!(chart == null)) {
-			var window_size = 3600;
-			var ts = d['ts']*1000;
-			var t = d['T'];
-			var p = d['P'];
-			var rh = d['RH'];
-			var series = chart.series[0];
-			var shift = series.data.length > window_size;
-			chart.series[0].addPoint([ts,t],true,shift);
-			chart.series[1].addPoint([ts,p],true,shift);
-			chart.series[2].addPoint([ts,rh],true,shift);
-		}
-	}
+			var d = conv([d['ts'],d[fields[0]],d[fields[1]],d[fields[2]]]);
 
-	function check_liveliness() {
-		if (is_fresh(chart,120)) {
-			//console.log('fresh');
-			$('body').css("-webkit-filter","");
-			$('body').css("filter","");
-		} else {
-			//console.log('stale');
-			$('body').css("-webkit-filter","grayscale(100%)");
-			$('body').css("filter","grayscale(100%)");
+			var shifts = _.map(chart.series,function(v,i,c) {
+				return v.data.length > window_size;
+			});
+			var shift = _.reduce(shifts,function(acc,val) {
+				return acc || val;
+			});
+
+			chart.series[0].addPoint([d[0],d[1]],true,shift);
+			chart.series[1].addPoint([d[0],d[2]],true,shift);
+			chart.series[2].addPoint([d[0],d[3]],true,shift);
 		}
 	}
 
@@ -69,6 +73,7 @@ $(function() {
 				format: '{value}°C',
 				style: {
 					color: t_color
+					
 				}
 			},
 			title: {
@@ -187,16 +192,25 @@ $(function() {
 	});
 	
 	// preload historical data (past one hour)
-	var begin = Date.now()/1000 - 3600;
+	var begin = Date.now()/1000 - preload;
 	var url = '/data/1/BME280.json?begin=' + begin;
 	//console.log(url);
 	$.getJSON(url,function(data) {
-		//console.log(data);
 		if (!(chart == null)) {
-			var tmp = _.zip(data['ts'],data['T'],data['P'],data['RH']);
-			for (var i = 0; i < tmp.length; i++) {
-				addpoint({'ts':tmp[i][0],'T':tmp[i][1],'P':tmp[i][2],'RH':tmp[i][3]});
-			}
+			// sort by timestamp (Highcharts requires this)
+			var tmp = _.zip(data['ts'],data[fields[0]],data[fields[1]],data[fields[2]]);
+			tmp = tmp.sort(function(a,b) { return a[0] > b[0]; });
+
+			// apply any necessary unit conversion and transformation
+			tmp = _.map(tmp,function(v,i,c) {
+				return conv(v);
+			});
+			
+			// populate plot with data
+			chart.series[0].setData(_.map(tmp,function(v,i,c) { return [v[0],v[1]]; }),false,false);
+			chart.series[1].setData(_.map(tmp,function(v,i,c) { return [v[0],v[2]]; }),false,false);
+			chart.series[2].setData(_.map(tmp,function(v,i,c) { return [v[0],v[3]]; }),false,false);
+			chart.redraw();
 		}
 	});
 	
@@ -217,12 +231,12 @@ $(function() {
 		if (m.substr(0,i).includes("_BME280")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
-			check_liveliness();
+			check_liveliness(chart,120);
 		}
 	};
 	ws.onerror = function(evt) {
 		console.log("error?")
 	};
 
-	setInterval(check_liveliness,60*1000);
+	setInterval(function() { check_liveliness(chart,120); },10*1000);
 });

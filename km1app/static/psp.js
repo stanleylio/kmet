@@ -1,26 +1,27 @@
 $(function() {
+	var window_size = 1000;	// max sample count
+	var preload = 3600;		// seconds
+	
+	var fields = ['psp_mV'];
+	
 	var chart;
+	
+	function conv(s) {
+		return [1e3*s[0],s[1]];
+	}
 
 	function addpoint(d) {
 		if (!(chart == null)) {
-			var window_size = 3600;
-			var ts = d['ts']*1000;
-			var psp_mV = d['psp_mV'];
-			var series = chart.series[0];
-			var shift = series.data.length > window_size;
-			chart.series[0].addPoint([ts,psp_mV],true,shift);
-		}
-	}
-
-	function check_liveliness() {
-		if (is_fresh(chart,120)) {
-			//console.log('fresh');
-			$('body').css("-webkit-filter","");
-			$('body').css("filter","");
-		} else {
-			//console.log('stale');
-			$('body').css("-webkit-filter","grayscale(100%)");
-			$('body').css("filter","grayscale(100%)");
+			var d = conv([d['ts'],d[fields[0]]]);
+			var shifts = _.map(chart.series,function(v,i,c) {
+				return v.data.length > window_size;
+			});
+			var shift = _.reduce(shifts,function(acc,val) {
+				return acc || val;
+			});
+			$.each(fields,function(k,v) {
+				chart.series[k].addPoint([d[0],d[k+1]],true,shift);
+			});
 		}
 	}
 
@@ -106,42 +107,30 @@ $(function() {
 				fontSize: '1em'
 			}
 		},
-		/*exporting: {
-			sourceWidth: 1600,
-			sourceHeight: 800,
-		},*/
 		credits: {
 			enabled: false
 		},
-		/*plotOptions: {
-			area: {
-				fillColor: {
-					linearGradient: {
-						x1:0,
-						y1:0,
-						x2:0,
-						y2:1
-					},
-					stops: [
-						[0, Highcharts.getOptions().colors[2]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[2]).setOpacity(0).get('rgba')]
-					]
-				}
-			}
-		},*/
 	});
 	
-	// preload historical data (past one hour)
-	var begin = Date.now()/1000 - 3600;
+	// preload recent data
+	var begin = Date.now()/1000 - preload;
 	var url = '/data/1/PSP.json?begin=' + begin;
 	//console.log(url);
 	$.getJSON(url,function(data) {
 		//console.log(data);
 		if (!(chart == null)) {
-			var tmp = _.zip(data['ts'],data['psp_mV']);
-			for (var i = 0; i < tmp.length; i++) {
-				addpoint({'ts':tmp[i][0],'psp_mV':tmp[i][1]});
-			}
+			var tmp = _.zip(data['ts'],data[fields[0]]);
+			tmp = tmp.sort(function(a,b) { return a[0] > b[0]; });
+
+			tmp = _.map(tmp,function(v,i,c) {
+				return conv(v);
+			});
+			
+			// populate plot with data
+			$.each(fields,function(k,v) {
+				chart.series[k].setData(_.map(tmp,function(v,i,c) { return [v[0],v[k+1]]; }),false,false);
+			});
+			chart.redraw();
 		}
 	});
 	
@@ -162,12 +151,12 @@ $(function() {
 		if (m.substr(0,i).includes("_PSP")) {
 			var data = JSON.parse(m.substr(i+1));
 			addpoint(data);
-			check_liveliness();
+			check_liveliness(chart,120);
 		}
 	};
 	ws.onerror = function(evt) {
 		console.log("error?")
 	};
 
-	setInterval(check_liveliness,5*60*1000);
+	setInterval(function() { check_liveliness(chart,120); },10*1000);
 });
