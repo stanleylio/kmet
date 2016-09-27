@@ -1,6 +1,6 @@
 $(function() {
 	var window_size = 1000;	// max sample count
-	var perload = 3600;		// seconds
+	var preload = 3600;		// seconds
 	
 	var fields = ['par_V'];
 	

@@ -139,8 +139,8 @@ $(function () {
 	// make the two columns the same height so that the bignum display can be vertically-centered
 	$('.box').matchHeight();
 
-	function check_liveliness() {
-		if ((Date.now() - last_received)/1000 <= 5) {
+	function check_liveliness(timeout) {
+		if ((Date.now() - last_received)/1000 <= timeout) {
 			//console.log('fresh');
 			$('body').css("-webkit-filter","");
 			$('body').css("filter","");
@@ -154,7 +154,7 @@ $(function () {
 		}
 	}
 
-	setInterval(check_liveliness,5*1000);
+	setInterval(function() { check_liveliness(10); },5*1000);
 	
 	function set_daynight(theme) {
 		var polar = $('#winddirection');
