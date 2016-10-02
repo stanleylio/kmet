@@ -21,8 +21,8 @@ $(function() {
 		$('#status_table ul a').each(function(k,v) {
 			var tag = $(v).data('tag');
 			var period = $(v).data('sample-period');
-			var begin = Date.now()/1000 - 5*period;
-			var url = '/data/1/' + tag + '.json?begin=' + begin;
+			var begin = Date.now()/1000 - Math.max(5*period,60);	// timeout = max of {5x sampling period, or 1 minute}
+			var url = '/data/1/' + tag + '.json?begin=' + begin;	// the latter is needed for difference in devices' clocks
 			$.getJSON(url,function(data) {
 				if (data['ts'].length > 0) {
 					$(v).addClass('list-group-item-success');
