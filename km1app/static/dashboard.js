@@ -1,9 +1,10 @@
 $(function() {
-	// not yet available: PortWind,StarboardWind,Rain,Humidity,BME280
-	var sensors = ['PAR','PIR','PSP','Port Wind','Starboard Wind','Ultrasonic Wind','Optical Rain'];
-	var tags = ['PAR','PIR','PSP','PortWind','StarboardWind','UltrasonicWind','OpticalRain'];
-	var sample_periods = [10,10,10,1,1,1,5];
+	// not yet tested/available: PortWind,StarboardWind,OpticalRain,Rain,Humidity
+	var sensors = ['PAR','PIR','PSP','Port Wind','Starboard Wind','Ultrasonic Wind','Optical Rain','BME280'];
+	var tags = ['PAR','PIR','PSP','PortWind','StarboardWind','UltrasonicWind','OpticalRain','BME280'];
+	var sample_periods = [10,10,10,1,1,1,5,60];
 	
+	// create a table of sensors
 	var ul = $('<ul class="list-group"></ul>');
 	$.each(_.zip(sensors,tags,sample_periods),function(k,v) {
 		var li = $('<a/>',{
@@ -11,12 +12,14 @@ $(function() {
 			class:"list-group-item",
 			text:v[0],
 			title:v[0],
+			"data-sensor":v[0],
 			"data-tag":v[1],
 			"data-sample-period":v[2]});
 		ul.append(li);
 	});
 	$('#status_table').html(ul);
 	
+	// fetch the latest readings from db and update the table color
 	function check_status() {
 		$('#status_table ul a').each(function(k,v) {
 			var tag = $(v).data('tag');
@@ -26,8 +29,19 @@ $(function() {
 			$.getJSON(url,function(data) {
 				if (data['ts'].length > 0) {
 					$(v).addClass('list-group-item-success');
+					$(v).removeClass('list-group-item-warning');
+					$(v).removeClass('list-group-item-danger');
+					//$(v).text($(v).data('sensor') + ' - '+ $.timeago(new Date(_.max(data['ts'])*1000)));
 				} else {
+					$(v).removeClass('list-group-item-success');
+					$(v).removeClass('list-group-item-warning');
 					$(v).addClass('list-group-item-danger');
+					var ago = _.max(data['ts']);
+					if (!isNaN(ago)) {
+						$(v).text($(v).data('sensor') + ' - '+ $.timeago(new Date(_.max(data['ts'])*1000)));
+					} else {
+						$(v).text($(v).data('sensor') + ' - (no data)');
+					}
 				}
 				/*var ago = Date.now()/1000 - _.max(data['ts']);
 				if () {
@@ -40,7 +54,6 @@ $(function() {
 			});
 		});
 	}
-	
 	check_status();
 	
 	window.setInterval(check_status,10*1000);
