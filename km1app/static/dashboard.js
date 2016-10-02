@@ -1,8 +1,8 @@
 $(function() {
 	// not yet available: PortWind,StarboardWind,Rain,Humidity,BME280
-	var sensors = ['PAR','PIR','PSP','Ultrasonic Wind','Optical Rain'];
-	var tags = ['PAR','PIR','PSP','UltrasonicWind','OpticalRain'];
-	var sample_periods = [10,10,10,1,5];
+	var sensors = ['PAR','PIR','PSP','Port Wind','Starboard Wind','Ultrasonic Wind','Optical Rain'];
+	var tags = ['PAR','PIR','PSP','PortWind','StarboardWind','UltrasonicWind','OpticalRain'];
+	var sample_periods = [10,10,10,1,1,1,5];
 	
 	var ul = $('<ul class="list-group"></ul>');
 	$.each(_.zip(sensors,tags,sample_periods),function(k,v) {
