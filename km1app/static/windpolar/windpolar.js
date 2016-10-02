@@ -27,7 +27,7 @@ $(function () {
 			}
 		},
 		subtitle: {
-			text: 'Data from the Ultrasonic Anemometer 85106',
+			text: 'Data from Ultrasonic Anemometer 85106',
 			style: {
 				fontSize: '1.5em',
 			}

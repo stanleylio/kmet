@@ -6,16 +6,12 @@ from json import dumps
 from query_data import read_time_range
 from json import dumps
 
+import sys,traceback,logging
+sys.path.append(r'/home/otg/logging')
+import db_configuration as dbconfig
 
-schema = {'PIR':['ir_mV','t_case_V','t_dome_V'],
-          'PAR':['par_V'],
-          'PSP':['psp_mV'],
-          'PortWind':['apparent_speed_mps','apparent_direction_deg'],
-          'StarboardWind':['apparent_speed_mps','apparent_direction_deg'],
-          'UltrasonicWind':['apparent_speed_mps','apparent_direction_deg'],
-          'OpticalRain':['weather_condition','instantaneous_mmphr','accumulation_mm'],
-          'BME280':['T','P','RH']}
-sensors = schema.keys()
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 @app.route('/')
@@ -24,18 +20,12 @@ def route_index():
 
 @app.route('/by_sensor/<sensor>/')
 def by_sensor(sensor):
-    m = {'PAR':'par',
-         'PIR':'pir',
-         'PSP':'psp',
-         'UltrasonicWind':'ultrasonic',
-         'PortWind':'portwind',
-         'StarboardWind':'starboardwind',
-         'BME280':'bmechart',
-         }
-    try:
-        return render_template(m[sensor] + '.html')
-    except:
-        return "it's beyond my paygrade"
+    if sensor in dbconfig.get_list_of_sensors():
+        try:
+            return render_template(sensor + '.html')
+        except:
+            logging.debug(traceback.format_exc())
+    return "it's beyond my paygrade"
 
 @app.route('/by_variable/<variable>/')
 def by_variable(variable):
@@ -49,15 +39,18 @@ def by_variable(variable):
 
 @app.route('/data/1/<sensor>.json')
 def data1(sensor):
-    if sensor in schema.keys():
-        begin = request.args.get('begin')
-        end = request.args.get('end')
-        col_list = ['ts']
-        col_list.extend(schema[sensor])
-        r = read_time_range(sensor,col_list,begin,end)
-        return dumps(r,separators=(',',':'))
-    else:
-        return 'too low on the totem pole'
+    if sensor in dbconfig.get_list_of_sensors():
+        try:
+            begin = request.args.get('begin')
+            end = request.args.get('end')
+            col_list = ['ts']
+            #col_list.extend(schema[sensor])
+            col_list.extend(dbconfig.get_list_of_variables(sensor))
+            r = read_time_range(sensor,col_list,begin,end)
+            return dumps(r,separators=(',',':'))
+        except:
+            logging.debug(traceback.format_exc())
+    return 'too low on the totem pole'
 
 @app.route('/meta/')
 def meta():
