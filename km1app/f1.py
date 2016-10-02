@@ -68,6 +68,6 @@ def faq():
 def about():
     return render_template('about.html')
 
-@app.route('/processing/')
+'''@app.route('/processing/')
 def processing():
-    return render_template('processing.html')
+    return render_template('processing.html')'''

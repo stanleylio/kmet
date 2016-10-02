@@ -8,9 +8,9 @@
 				<h2>FAQ</h2>
 
 				<a name="q1"></a>
-				<h3>What is this?</h3>
-				<p>met. mast upgrade... blah. for details, see this doc.</p>
-				<p>the electrical box is a bird nest... the chart room cabinet is another. no one knows the wiring, and stages of processing made to the data</p>
+				<h3>About this system?</h3>
+				<p>met. mast upgrade... in 2016. the electrical box is a bird nest... the chart room cabinet is another. no one knows the wiring, and stages of processing made to the data</p>
+				<p>for details, see this doc.</p>
 				
 				<a name="q2"></a>
 				<h3>Where is the "met. mast"? Where are the sensors?</h3>
@@ -21,33 +21,26 @@
 				</div>
 				
 				<a name="q3"></a>
-				<h3>What is the data source of the real-time plots?</h3>
-				<p>The plots are taking data directly from the <a href="#">logger</a> rather than from log files or database. One exception, however, is when a plot is first loaded, some recent data are pulled from the database to initialize the plot.</p>
-				<p>If more computing resource is available, I would consider generating static plots with larger time span (perhaps plot data in the past 30 days).</p>
+				<h3>Where do the real-time plots get the data?</h3>
+				<p>The plots are taking data directly from the <a href="#">logger</a> by listening in on data broadcast (via the ZeroMQ-WebSocket relay).</p>
+				<p>Note that since the plots are not retrieving data from log files or database, they do not reflect the actual content of the database/log (i.e. the database logging process might have gone down and the plots would still update themselves). One exception, however, is when a plot is first loaded, some recent data are pulled from the database to initialize the plot.</p>
+				<p>(If more computing resource is available, I would consider generating static plots with larger time span (perhaps plot data in the past 30 days) that actually pull data from the database.)</p>
 				
 				<a name="q4"></a>
-				<h3>Where does variable X come from?</h3>
-				<p>see flow chart...</p>
+				<h3>Why does the real-time plot turns grayscale?</h3>
+				<p>This signals that the plot is stale. This happens if the logger has stopped working, or if connection to the ZeroMQ-WebSocket relay has gone down.</p>
 				
 				<a name="q5"></a>
-				<h3>"Stale"?</h3>
-				<p>at least two types of "stale":</p>
-				<ul>
-					<li>logger not getting new reading (e.g. sensor down, logger process not running)</li>
-					<li>connection to web server lost</li>
-				</ul>
-				
-				<h3>maintenance and technical info</h3>
-				<p>see this doc</p>
-				
-				<p>Where is the box? in the electrical box up on the met. mast. [picture goes here, inside and outside]</p>
-				
-				<p>What's in the box? A single-board computer running Linux. wire terminals, 12V lead-acid battery backup, fiber optic Ethernet switch</p>
-				
-				<h3>"The page turns grayscale even though new data are coming in."</h3>
-				<p>The clock of your device might be out of sync.</p>
-				
-				<p>Where to download the data? [policy goes here... I remember reading sth about some USB stick... sth about "room not clean, no data"]</p>
+				<h3>The page turns grayscale even though new data are coming in.</h3>
+				<p>The clocks on the logger and your device might be out of sync. If you sure that the clock on your device is accurate down to the seconds, notify the admin of the problem (the logger's clock might be off).</p>
+
+				<a name="q6"></a>
+				<h3>Where can I get a copy of the data?</h3>
+				<p>[KM data policy goes here... I remember reading sth about some USB stick in a manual somewhere on the KM... something about &quot;no data if rooms are not clean&quot;...]</p>
+
+				<a name="q7"></a>
+				<h3>Where can I find the technical details and maintenance info?</h3>
+				<p>See this <a href="#">doc</a>.</p>
 			</div>
 		</div>
 	</div>
