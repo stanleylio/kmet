@@ -7,7 +7,7 @@ from query_data import read_time_range
 from json import dumps
 
 import sys,traceback,logging
-sys.path.append(r'/home/otg/logging')
+sys.path.append(r'/home/otg/kmetlog')
 import db_configuration as dbconfig
 
 

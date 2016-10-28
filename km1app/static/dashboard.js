@@ -1,7 +1,7 @@
 $(function() {
 	// not yet tested/available: PortWind,StarboardWind,OpticalRain,Rain,Humidity
-	var sensors = ['PAR','PIR','PSP','Port Wind','Starboard Wind','Ultrasonic Wind','Optical Rain','BME280'];
-	var tags = ['PAR','PIR','PSP','PortWind','StarboardWind','UltrasonicWind','OpticalRain','BME280'];
+	var sensors = ['PAR','PIR','PSP','Port Wind','Starboard Wind','Ultrasonic Wind','Optical Rain','Bucket Rain','Humidity','BME280'];
+	var tags = ['PAR','PIR','PSP','PortWind','StarboardWind','UltrasonicWind','OpticalRain','BucketRain','Rotronics','BME280'];
 	var sample_periods = [10,10,10,1,1,1,5,60];
 	
 	// create a table of sensors
@@ -40,7 +40,7 @@ $(function() {
 					if (!isNaN(ago)) {
 						$(v).text($(v).data('sensor') + ' - '+ $.timeago(new Date(_.max(data['ts'])*1000)));
 					} else {
-						$(v).text($(v).data('sensor') + ' - (no data)');
+						$(v).text($(v).data('sensor') + ' - (no recent data)');
 					}
 				}
 				/*var ago = Date.now()/1000 - _.max(data['ts']);
