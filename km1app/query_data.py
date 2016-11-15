@@ -23,7 +23,7 @@ logging.basicConfig()
 #    return datetime.utcfromtimestamp(ts)
 
 
-dbfile = '/var/logging/data/met.db'
+dbfile = '/var/kmetlog/data/met.db'
 assert exists(dbfile)
 
 # database stuff

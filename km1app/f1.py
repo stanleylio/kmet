@@ -8,7 +8,7 @@ from json import dumps
 
 import sys,traceback,logging
 sys.path.append(r'/home/otg/kmetlog')
-import db_configuration as dbconfig
+from dbstuff import get_list_of_tables,get_list_of_columns
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -20,7 +20,7 @@ def route_index():
 
 @app.route('/by_sensor/<sensor>/')
 def by_sensor(sensor):
-    if sensor in dbconfig.get_list_of_sensors():
+    if sensor in get_list_of_tables():
         try:
             return render_template(sensor + '.html')
         except:
@@ -39,13 +39,13 @@ def by_variable(variable):
 
 @app.route('/data/1/<sensor>.json')
 def data1(sensor):
-    if sensor in dbconfig.get_list_of_sensors():
+    if sensor in get_list_of_tables():
         try:
             begin = request.args.get('begin')
             end = request.args.get('end')
             col_list = ['ts']
             #col_list.extend(schema[sensor])
-            col_list.extend(dbconfig.get_list_of_variables(sensor))
+            col_list.extend(get_list_of_columns(sensor))
             r = read_time_range(sensor,col_list,begin,end)
             return dumps(r,separators=(',',':'))
         except:
